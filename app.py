@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User
-from forms import RegisterUserForm, LoginForm
+from models import db, connect_db, User, Feedback
+from forms import RegisterUserForm, LoginForm, DeleteUserForm
 from sqlalchemy.exc import IntegrityError
 from helpers import secrets
 from random import choice
@@ -29,12 +29,6 @@ def register_new_user():
 
     form = RegisterUserForm()
     if form.validate_on_submit():
-        # username = form.username.data
-        # password = form.password.data
-        # email = form.email.data
-        # first_name= form.first_name.data
-        # last_name = form.last_name.data
-        # new_user = User.register(username, password, email, first_name, last_name)
         new_user = User.register_from_form(form)
     
         db.session.add(new_user)
@@ -44,8 +38,6 @@ def register_new_user():
             form.username.errors.append("Username taken. Try again, ya' twit.")
             return render_template('register.html', form=form)
         
-        session['username'] = new_user.username
-        flash('Welcome. Successfully created your account. You are now logged in.', 'success')
         return redirect(f'/users/{new_user.username}')
 
     return render_template('register.html', form=form)
@@ -63,8 +55,6 @@ def login():
         password = form.password.data
         user = User.authenticate(username, password)
         if user:
-            session['username'] = user.username
-            flash(f'You are now logged in, {user.first_name}.', 'success')
             return redirect(f'/users/{user.username}')
         flash('invalid username/password combination', 'danger')
 
@@ -80,6 +70,12 @@ def display_secret_message():
     flash('only logged in users can view secrets', 'danger')
     return redirect('/login')
 
+@app.route('/users')
+def display_user_list():
+    """displays a list of all users with usernames only for anyone who is not logged in, and full profile information for valid, logged-in users"""
+    users = User.query.all()
+    return render_template('users.html', users=users)
+
 @app.route('/users/<username>')
 def display_user_public_profile(username):
     """display all public information we have on a given user
@@ -90,6 +86,51 @@ def display_user_public_profile(username):
     flash('only logged in users can view that page', 'warning')
     return redirect('/')
 
+@app.route('/users/<username>/delete', methods=['GET', 'POST'])
+def confirm_delete_user_and_feedback(username):
+    """Delete a user and all of their feedback. 
+    A user can only be deleted by themselves, 
+    so return an error if the user to be deleted is not logged in."""
+    user = User.query.get_or_404(username)
+    # if this page is to delete any other than logged in user, 
+    # redirect to home page
+    if not username == session["username"]:
+        flash('only a logged in user can delete themself', 'danger')
+        return redirect('/')
+
+    session.pop("username")
+    db.session.delete(user)
+    feedback_of_user = Feedback.query.filter_by(username=username)
+    for feedback in feedback_of_user:
+        db.session.delete(feedback)
+    db.session.commit()
+    flash(f'user {username} has been deleted, along with all their feedback', 'warning')
+    return redirect('/')
+
+
+    # TODO for future delevelopment:
+    # I didn't get this rabbithole to work
+    form = DeleteUserForm()
+
+    # if they really wanted to do this, do it;
+    # redirect to their user page if they did not
+    if form.validate_on_submit():
+        confirmation = form.confirmation.data
+        if confirmation == username:
+            session.pop("username")
+            feedback_of_user = Feedback.query.filter_by(username=username)
+            db.session.delete(user)
+            for feedback in feedback_of_user:
+                db.session.delete(feedback)
+            db.session.commit()
+            return redirect('/')
+        else:
+            flash('user deletion neither confirmed nor executed', 'info')
+            return redirect(f'/users/{username}')
+
+    # confirm they really want to delete themselves
+    return render_template('delete.html', user=user, form=form)
+                
 @app.route('/logout', methods=['POST'])
 def logout():
     """log out of site and redirect to home"""

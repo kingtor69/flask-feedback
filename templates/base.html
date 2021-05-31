@@ -29,17 +29,14 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a href="{% block users_path %}{% endblock %}users" class="nav-link">show users</a>
+            <a href="/users" class="nav-link">show users</a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="{% block posts_path %}{% endblock %}posts" class="nav-link">show posts</a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="/secret" class="nav-link text-primary">want to know a secret?</a>
           </li>
-          <!-- <li class="nav-item">
-            <a href="./posts.html" class="nav-link">show posts</a>
-          </li> -->
           {% block nav_items %}{% endblock %}
         </ul>
       </div>
@@ -47,7 +44,7 @@
         <ul class="nav navbar-nav flex-row float-right">
           {% if session['username'] %}
           <li class="nav-item">
-            <a class="nav-link pr-5 text-light" href="/users"><b>{{ session['username'] }}</b></a>
+            <a class="nav-link pr-5 text-light" href="/users/{{ session['username'] }}"><b>{{ session['username'] }}</b></a>
           </li>
           <li class="nav-item">
             <form action="/logout" method="POST"><button type="submit" class="nav-link btn btn-link pr-3 text-light">Logout</button></form>
@@ -92,7 +89,7 @@
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   {% block scripts_between %}{% endblock %}
-  <script src="{% block scripts_path %}{% endblock %}static/app.js"></script>
+  <script src="static/app.js"></script>
   {% block scripts_after %}{% endblock %}
 </body>
 </html>

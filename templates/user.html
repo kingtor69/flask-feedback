@@ -19,6 +19,12 @@
             <th class="h5 pt-3 text-muted"><b>email</b></th>
             <td class="h3"><a href="mailto:{{ user.email }}" class="text-info">{{ user.email }}</a></td>
           </tr>
+          {% if user.username == session["username"] %}
+          <tr>
+            <td><a href="/users/{{ user.username }}/delete" class="btn btn-danger btn-sm">delete this user</a></td>
+            <td class="text-danger border-warning rounded">that button will delete your user <b>and</b> any feedback you have posted!</td>
+          </tr>
+          {% endif %}
         </table>
       </div>
       <div class="d-none d-md-block col col-md-2 col-lg-3"></div>

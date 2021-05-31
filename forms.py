@@ -12,3 +12,6 @@ class RegisterUserForm(FlaskForm):
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[InputRequired(message="Please enter a username")])
     password = PasswordField("Password", validators=[InputRequired(message="Please enter a password")])
+
+class DeleteUserForm(FlaskForm):
+    confirmation = StringField("To confirm you want to delete, please type your username:")
