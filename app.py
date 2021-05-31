@@ -46,8 +46,7 @@ def register_new_user():
         
         session['username'] = new_user.username
         flash('Welcome. Successfully created your account. You are now logged in.', 'success')
-
-        return redirect('/')
+        return redirect(f'/users/{new_user.username}')
 
     return render_template('register.html', form=form)
 
@@ -66,7 +65,7 @@ def login():
         if user:
             session['username'] = user.username
             flash(f'You are now logged in, {user.first_name}.', 'success')
-            return redirect ('/secret')
+            return redirect(f'/users/{user.username}')
         flash('invalid username/password combination', 'danger')
 
     return render_template('login.html', form=form)
@@ -78,8 +77,18 @@ def display_secret_message():
     if 'username' in session:
         secret = choice(secrets)
         return render_template('secret.html', secret=secret)
-    flask ('only logged in users can view secrets', 'danger')
+    flash('only logged in users can view secrets', 'danger')
     return redirect('/login')
+
+@app.route('/users/<username>')
+def display_user_public_profile(username):
+    """display all public information we have on a given user
+    in this case 'public' meaning validated, logged-in users"""
+    if 'username' in session:
+        user = User.query.get_or_404(username)
+        return render_template('user.html', user=user)
+    flash('only logged in users can view that page', 'warning')
+    return redirect('/')
 
 @app.route('/logout', methods=['POST'])
 def logout():
