@@ -1,8 +1,10 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User
-from forms import RegisterUserForm
+from forms import RegisterUserForm, LoginForm
 from sqlalchemy.exc import IntegrityError
+from helpers import secrets
+from random import choice
 
 app = Flask(__name__)
 
@@ -27,12 +29,13 @@ def register_new_user():
 
     form = RegisterUserForm()
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        email = form.email.data
-        first_name= form.first_name.data
-        last_name = form.last_name.data
-        new_user = User.register(username, password, email, first_name, last_name)
+        # username = form.username.data
+        # password = form.password.data
+        # email = form.email.data
+        # first_name= form.first_name.data
+        # last_name = form.last_name.data
+        # new_user = User.register(username, password, email, first_name, last_name)
+        new_user = User.register_from_form(form)
     
         db.session.add(new_user)
         try:
@@ -46,8 +49,34 @@ def register_new_user():
 
         return redirect('/')
 
-        
-    
-    # don't forget in validating to add unique test for username
-
     return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """log and existing user into the site, 
+    create a session for that user, 
+    post error if authentication fails,
+    offer link to registration."""
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        user = User.authenticate(username, password)
+        if user:
+            session['username'] = user.username
+            flash(f'You are now logged in, {user.first_name}.', 'success')
+            return redirect ('/secret')
+        flash('invalid username/password combination', 'danger')
+
+    return render_template('login.html', form=form)
+
+@app.route('/secret')
+def display_secret_message():
+    """display a secret message for valid, logged-in users;
+    redirect unauthorized visitors to login screen with flashed message"""
+    if 'username' in session:
+        secret = choice(secrets)
+        return render_template('secret.html', secret=secret)
+    flask ('only logged in users can view secrets', 'danger')
+    return redirect('/login')

@@ -43,7 +43,7 @@ class User(db.Model):
             return False
 
     @classmethod
-    def user_from_form(cls, form):
+    def register_from_form(cls, form):
         username = form.username.data
         password = form.password.data
         email = form.email.data

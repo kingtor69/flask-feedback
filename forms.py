@@ -8,3 +8,7 @@ class RegisterUserForm(FlaskForm):
     email = StringField("email address", validators=[Email(message="Please enter a valid email address")])
     first_name = StringField("First Name", validators=[Length(max=30, message="Sorry, your first name as entered is too long for our database. Please enter a shortened version."), InputRequired(message="Please enter your first name.")])
     last_name = StringField("Last Name", validators=[Length(max=30, message="Sorry, your last name as entered is too long for our database. Please enter a shortened version."), InputRequired(message="Please enter your last name.")])
+
+class LoginForm(FlaskForm):
+    username = StringField("Username", validators=[InputRequired(message="Please enter a username")])
+    password = PasswordField("Password", validators=[InputRequired(message="Please enter a password")])
