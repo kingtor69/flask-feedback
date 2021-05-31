@@ -41,13 +41,25 @@
             <a href="./posts.html" class="nav-link">show posts</a>
           </li> -->
           {% block nav_items %}{% endblock %}
-          <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% block dropdown_nav_items %}{% endblock %}
-            <hr>
-            <li class="nav-item">
-              <a href="" class="nav-link">back home</a>
-            </li>
-          </div> -->
+        </ul>
+      </div>
+      <div class="collapse navbar-collapse" id="navbarUserCotent">
+        <ul class="nav navbar-nav flex-row float-right">
+          {% if session['username'] %}
+          <li class="nav-item">
+            <a class="nav-link pr-5 text-light" href="/users"><b>{{ session['username'] }}</b></a>
+          </li>
+          <li class="nav-item">
+            <form action="/logout" method="POST"><button type="submit" class="nav-link btn btn-link pr-3 text-light">Logout</button></form>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link pr-3 text-light" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/register">Sign up</a>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </nav>

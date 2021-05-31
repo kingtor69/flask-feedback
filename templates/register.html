@@ -2,13 +2,14 @@
 {% block title %}regsiter{% endblock %}
 {% block header %}Welcome to Feedback (not an audio blog){% endblock %}
 {% block content %}
+
 <div class="container">
   <div class="row justify-content-center">
-    <h2>Please fill out the registration information below to access our goodness.</h2>
+    <h2 class="text-center">Please fill out the registration information below to access our goodness.</h2>
   </div>
-  <div class="row justify-content-between">
-    <div class="d-none d-md-block col col-md-2 col-lg-3"></div>
-    <div class="col col-md-8 col lg-6">
+  <div class="row justify-content-center">
+    <div class="d-none d-md-block col col-3"></div>
+    <div class="col col-6">
       <div class="row justify-content-center">
         <form action="/register" method="POST">
           {{ form.hidden_tag() }}
@@ -25,12 +26,11 @@
           <button type="submit" class="btn btn-primary form-control my-3">register</button>
         </form>
       </div>
-      <div class="row">
+      <div class="row justify-content-center">
         <h3><a href="/login" class="d-block btn btn-outline-secondary btn-block">if you already have an account with us, sign in here</a></h3>
       </div>
     </div>
-    <div class="d-none d-md-block col col-md-2 col-lg-4"></div>
+    <div class="d-none d-md-block col col-3"></div>
   </div>
 </div>
-
 {% endblock %}

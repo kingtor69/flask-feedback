@@ -21,7 +21,7 @@ connect_db(app)
 @app.route('/')
 def load_home_page():
     """load home page"""
-    return redirect('/register')
+    return render_template('home.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_new_user():
@@ -80,3 +80,10 @@ def display_secret_message():
         return render_template('secret.html', secret=secret)
     flask ('only logged in users can view secrets', 'danger')
     return redirect('/login')
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    """log out of site and redirect to home"""
+    session.pop("username")
+    flash('You have successfully logged out.', 'info')
+    return redirect('/')
