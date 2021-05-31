@@ -12,6 +12,8 @@
             {% if session["username"] %}
             <th>user's actual name</th>
             <th>email</th>
+            {% else %}
+            <th><a href="/login" class="text-info border-none">login to see more</a></th>
             {% endif %}
           </thead>
           <tbody>
@@ -22,7 +24,7 @@
                   <td>{{ user.first_name }} {{ user.last_name }}</td>
                   <td><a href="mailto: {{ user.email }}">{{ user.email }}</a></td>
                 {% else %}
-                  <td>{{ user.username }} </td>
+                  <td colspan="2">{{ user.username }} </td>
                 {% endif %}
               </tr>
             {% endfor %}

@@ -21,7 +21,7 @@ connect_db(app)
 @app.route('/')
 def load_home_page():
     """load home page"""
-    return render_template('home.html')
+    return redirect('/users')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_new_user():
