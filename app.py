@@ -25,7 +25,28 @@ def register_new_user():
     """load form for new user and process that input, creating a new user in the database"""
 
     form = RegisterUserForm()
-    if 
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        email = form.email.data
+        first_name= form.first_name.data
+        last_name = form.last_name.data
+        new_user = User.register(username, password, email, first_name, last_name)
+    
+        db.session.add(new_user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            form.username.errors.append("Username taken. Try again, ya' twit.")
+            return render_template('register.html', form=form)
+        
+        session['user_id'] = new_user.id
+        flash('Welcome. Successfully created your account. You are now logged in.', 'success')
+
+        return redirect('/tweets')
+
+        
+    
     # don't forget in validating to add unique test for username
 
-    return render_template('register.html, form=form')
+    return render_template('register.html', form=form)
