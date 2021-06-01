@@ -7,7 +7,7 @@
       <div class="col col-md-2 col-lg-3"></div>
       <div class="col col-md-8 col-lg-6">
         <h2>deleting your user will also delete all of your feedback</h2>
-        <form action="/users/{{ user.username }}/delete">
+        <form action="/users/{{ user.username }}/delete" novalidate>
           {{ form.hidden_tag() }}
           {% for field in form 
             if field.widget.input_type != 'hidden' %}

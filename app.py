@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Feedback
-from forms import RegisterUserForm, LoginForm, DeleteUserForm
+from forms import RegisterUserForm, LoginForm, DeleteUserForm, FeedbackForm
 from sqlalchemy.exc import IntegrityError
 from helpers import secrets
 from random import choice
@@ -23,6 +23,7 @@ def load_home_page():
     """load home page"""
     return redirect('/users')
 
+################## register/login/logout routes
 @app.route('/register', methods=['GET', 'POST'])
 def register_new_user():
     """load form for new user and process that input, creating a new user in the database"""
@@ -60,6 +61,14 @@ def login():
 
     return render_template('login.html', form=form)
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    """log out of site and redirect to home"""
+    session.pop("username")
+    flash('You have successfully logged out.', 'info')
+    return redirect('/')
+
+########### secret route
 @app.route('/secret')
 def display_secret_message():
     """display a secret message for valid, logged-in users;
@@ -70,6 +79,7 @@ def display_secret_message():
     flash('only logged in users can view secrets', 'danger')
     return redirect('/login')
 
+##################### users routes
 @app.route('/users')
 def display_user_list():
     """displays a list of all users with usernames only for anyone who is not logged in, and full profile information for valid, logged-in users"""
@@ -82,7 +92,11 @@ def display_user_public_profile(username):
     in this case 'public' meaning validated, logged-in users"""
     if 'username' in session:
         user = User.query.get_or_404(username)
-        return render_template('user.html', user=user)
+        # TODO: either this feedback isn't loading properly, or user.html isn't displaying it properly
+        user_feedback = Feedback.query.filter_by(username=username).all() or None
+        # ...and 'or None' is not the problem
+        return render_template('user.html', user=user, feedback=user_feedback)
+
     flash('only logged in users can view that page', 'warning')
     return redirect('/')
 
@@ -131,9 +145,28 @@ def confirm_delete_user_and_feedback(username):
     # confirm they really want to delete themselves
     return render_template('delete.html', user=user, form=form)
                 
-@app.route('/logout', methods=['POST'])
-def logout():
-    """log out of site and redirect to home"""
-    session.pop("username")
-    flash('You have successfully logged out.', 'info')
-    return redirect('/')
+##################### feedback routes
+@app.route('/users/<username>/feedback/add', methods=['GET', 'POST'])
+def new_feedback_form(username):
+    if not session['username'] == username:
+        if session['username']:
+            logged_in_username = session['username']
+            return redirect(f'/users/{loggin_in_username}/feedback/add')
+        else:
+            flash('Only logged-in users can post feedback', 'info')
+            return redirect('/login')
+
+    form = FeedbackForm()
+    user = User.query.get_or_404(username)
+
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+        feedback = Feedback(title=title, content=content, username=username)
+        db.session.add(feedback)
+        db.session.commit()
+        return redirect(f'/users/{username}')
+
+    # TODO: error messages in this template are wrong, shows "content" on both fields if there's an error on either 
+    return render_template('feedback.html', user=user, form=form)
+        

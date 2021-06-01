@@ -60,6 +60,12 @@ class Feedback(db.Model):
 
     __tablename__ = "feedback"
 
+    def __repr__ (self):
+        return f"""<Feedback {self.id}
+        {self.title}
+        {self.content}
+        ~ {self.username}>"""
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.String, nullable=False)

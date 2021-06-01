@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import InputRequired, Email, Length
 
 class RegisterUserForm(FlaskForm):
@@ -15,3 +15,7 @@ class LoginForm(FlaskForm):
 
 class DeleteUserForm(FlaskForm):
     confirmation = StringField("To confirm you want to delete, please type your username:")
+
+class FeedbackForm(FlaskForm):
+    title = StringField("Title", validators=[InputRequired(message="Feedback needs to have a title"), Length(max=100, message="That title is too long. Put some of that goodness in the content, please.")])
+    content = TextAreaField("Feedback", validators=[InputRequired(message="We want your feedback! Please include some here, and be as detailed as you like.")])
