@@ -88,14 +88,11 @@ def display_user_list():
 
 @app.route('/users/<username>')
 def display_user_public_profile(username):
-    """display all public information we have on a given user
-    in this case 'public' meaning validated, logged-in users"""
+    """Display all public information we have on a given user, including all feedback."""
     if 'username' in session:
         user = User.query.get_or_404(username)
-        # TODO: either this feedback isn't loading properly, or user.html isn't displaying it properly
         user_feedback = Feedback.query.filter_by(username=username).all() or None
-        # ...and 'or None' is not the problem
-        return render_template('user.html', user=user, feedback=user_feedback)
+        return render_template('user.html', user=user, feedbacks=user_feedback)
 
     flash('only logged in users can view that page', 'warning')
     return redirect('/')
@@ -168,5 +165,33 @@ def new_feedback_form(username):
         return redirect(f'/users/{username}')
 
     # TODO: error messages in this template are wrong, shows "content" on both fields if there's an error on either 
-    return render_template('feedback.html', user=user, form=form)
+    return render_template('feedback.html', user=user, form=form, new_or_edit="New", add_or_update="add")
         
+@app.route('/feedback/<int:id>/update', methods=['GET', 'POST'])
+def edit_feedback(id):
+    feedback = Feedback.query.get_or_404(id)
+    if not feedback.username == session['username']:
+        flash("Only users who posted feedback may edit it.", "warning")
+        return redirect('/')
+
+    user = User.query.get(feedback.username)
+    form = FeedbackForm()
+
+    if form.validate_on_submit():
+        feedback.title = form.title.data
+        feedback.content = form.content.data
+        db.session.add(feedback)
+        db.session.commit()
+        # TODO: form ends up at '/users/{username}/feedback/update' wtf?
+        return redirect(f'/users/{user.username}')
+
+    # TODO: form isn't prepopulated and has weird error messages. Again, might be something wrong with the template.
+    return render_template('feedback.html', user=user, form=form, new_or_edit="Edit", add_or_update="update")
+
+@app.route('/feedback/<int:id>/delete', methods=['POST'])
+def delete_feedback(id):
+    feedback = Feedback.query.get_or_404(id)
+    db.session.delete(feedback)
+    db.session.commit()
+    flash('feedback deleted', 'info')
+    return redirect('/')
