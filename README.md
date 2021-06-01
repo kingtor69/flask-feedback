@@ -14,7 +14,18 @@
  6. Make /users/<username>
  7. Feedback Model
  8. Feedback Routes (also modify user routes)
-Steps 1-7 are done.
 
 ## What that means to the user:
-Registered users can login or new users can register. There is content for users only, including user profiles for any user. 
+ - Registered users can login or new users can register. 
+ - There is content for users only, including user profiles for any user. 
+ - Users can post feedback.
+ - All users can view feedback no matter who wrote it.
+ - Users can edit or delete their own feedback only.
+ - Users can delete themselves, which will delete all of their feedback as well.
+
+## Future development ideas
+ - user delete could use a confirmation warning
+   - I started one that's like github's where the user has to type their own username in after clicking delete
+   - could also just do an alert, or whatever the alerts are that you can cancel
+ - admin user (boolean column in user db 'is_admin') can edit or delete everyone's feedback
+ - admin replies to feedback?

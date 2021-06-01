@@ -16,9 +16,9 @@
           {% for field in form 
             if field.widget.input_type != 'hidden' %}
             <div class="form-group">
-              {{ field.label }}
+              {{ field.label }}{% if field.flags.required %} <sup></sup><span class="text-danger">*</span></sup>{% endif %}
               {{ field(class_="form-control")}}
-              {% for error in form.errors %}
+              {% for error in field.errors %}
               <span class="d-block text-warning">{{ error }}</span>
               {% endfor %}
             </div>

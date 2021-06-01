@@ -110,10 +110,10 @@ def confirm_delete_user_and_feedback(username):
         return redirect('/')
 
     session.pop("username")
-    db.session.delete(user)
     feedback_of_user = Feedback.query.filter_by(username=username)
     for feedback in feedback_of_user:
         db.session.delete(feedback)
+    db.session.delete(user)
     db.session.commit()
     flash(f'user {username} has been deleted, along with all their feedback', 'warning')
     return redirect('/')
@@ -175,7 +175,7 @@ def edit_feedback(id):
         return redirect('/')
 
     user = User.query.get(feedback.username)
-    form = FeedbackForm()
+    form = FeedbackForm(obj=feedback)
 
     if form.validate_on_submit():
         feedback.title = form.title.data

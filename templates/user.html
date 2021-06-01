@@ -61,6 +61,15 @@
                   </td>
                 </tr>
               {% endfor %}
+              {% if session['username'] == user.username %}
+                <tr>
+                  <td colspan="3">
+                    <form action="/users/{{ user.username }}/feedback/add" novalidate>
+                      <button class="btn btn-primary btn-block">post more feedback</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endif %}
             </tbody>
           </table>
         {% else %}
